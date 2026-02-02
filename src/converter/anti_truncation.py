@@ -14,15 +14,15 @@ from log import log
 
 # 反截断配置
 DONE_MARKER = "[done]"
-CONTINUATION_PROMPT = f"""请从刚才被截断的地方继续输出剩余的所有内容。
+CONTINUATION_PROMPT = f"""Continue outputting all remaining content from where it was just cut off.
 
-重要提醒：
-1. 不要重复前面已经输出的内容
-2. 直接继续输出，无需任何前言或解释
-3. 当你完整完成所有内容输出后，必须在最后一行单独输出：{DONE_MARKER}
-4. {DONE_MARKER} 标记表示你的回答已经完全结束，这是必需的结束标记
+Important Reminder:
+1. Do not repeat content that has already been output previously.
+2. Continue outputting directly, without any preamble or explanation.
+3. After you have fully completed outputting all content, you must output separately on the last line: {DONE_MARKER}
+4. The {DONE_MARKER} tag indicates that your response has completely ended; this is a required end marker.
 
-现在请继续输出："""
+Now continue outputting: """
 
 # 正则替换配置
 REGEX_REPLACEMENTS: List[Tuple[str, str, str]] = [
@@ -144,24 +144,24 @@ def apply_anti_truncation(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     # 添加反截断指令
     anti_truncation_instruction = {
-        "text": f"""严格执行以下输出结束规则：
+        "text": f"""Strictly execute the following output termination rules:
 
-1. 当你完成完整回答时，必须在输出的最后单独一行输出：{DONE_MARKER}
-2. {DONE_MARKER} 标记表示你的回答已经完全结束，这是必需的结束标记
-3. 只有输出了 {DONE_MARKER} 标记，系统才认为你的回答是完整的
-4. 如果你的回答被截断，系统会要求你继续输出剩余内容
-5. 无论回答长短，都必须以 {DONE_MARKER} 标记结束
+1. When you complete a full response, you must output {DONE_MARKER} on a separate line at the very end of the output.
+2. The {DONE_MARKER} tag indicates that your response has completely ended; this is a required end marker.
+3. The system considers your response complete only if the {DONE_MARKER} tag is output.
+4. If your response is truncated, the system will ask you to continue outputting the remaining content.
+5. Regardless of the length of the response, it must end with the {DONE_MARKER} tag.
 
-示例格式：
+Example Format:
 ```
-你的回答内容...
-更多回答内容...
+Your response content...
+More response content...
 {DONE_MARKER}
 ```
 
-注意：{DONE_MARKER} 必须单独占一行，前面不要有任何其他字符。
+Note: {DONE_MARKER} must occupy a line by itself, with no other characters preceding it.
 
-这个规则对于确保输出完整性极其重要，请严格遵守。"""
+This rule is extremely important for ensuring output completeness; observe it strictly."""
     }
 
     # 检查是否已经包含反截断指令
@@ -390,9 +390,9 @@ class AntiTruncationStreamProcessor:
         content_summary = ""
         if accumulated_text:
             if len(accumulated_text) > 200:
-                content_summary = f'\n\n前面你已经输出了约 {len(accumulated_text)} 个字符的内容，结尾是：\n"...{accumulated_text[-100:]}"'
+                content_summary = f'\n\nPreviously, you have output approximately {len(accumulated_text)} characters of content, ending with:\n"...{accumulated_text[-100:]}"'
             else:
-                content_summary = f'\n\n前面你已经输出的内容是：\n"{accumulated_text}"'
+                content_summary = f'\n\nThe content you have previously output is:\n"{accumulated_text}"'
 
         detailed_continuation_prompt = f"""{CONTINUATION_PROMPT}{content_summary}"""
 
