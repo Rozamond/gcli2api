@@ -1,4 +1,4 @@
-full_hash=93d788f6d080c25e026e4f9d7c26a5ebd3396ff7
-short_hash=93d788f
-message=消息测试增加详细报错信息
-date=2026-02-02 12:38:58 +0800
+full_hash=d6901222482bb49fc28952a5dbc5c01c16dfb067
+short_hash=d690122
+message=Update antigravity.py
+date=2026-02-07 12:18:06 +0800
